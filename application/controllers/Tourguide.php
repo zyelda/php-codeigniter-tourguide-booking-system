@@ -193,119 +193,38 @@
 			$data['ratelist'] = $this->Review_mdl->ratelist($id);
 			$data['innerdata'] = 'tourguide_show';
 
-			// calendar
+			// Calendar setup
 			$checkbookingdate = $this->Request_mdl->checkdate($id);
-
-			$urlyear = $this->uri->segment(4);
-			$urlmonth = $this->uri->segment(5);
-
+			$urlyear = (int)$this->uri->segment(4);
+			$urlmonth = (int)$this->uri->segment(5);
 			$nowyear = date('Y');
 			$nowmonth = date('m');
 			$nowday = date('d');
 
-			$datedata = "";
+			$datedata = [];  // Inisialisasi sebagai array
+			$endday = date('t', strtotime("$urlyear-$urlmonth-01"));  // Jumlah hari dalam bulan
 
-			// end day 
-				if ($urlmonth == 4 || $urlmonth == 6 || $urlmonth == 9 || $urlmonth == 11) 
-					$endday = 31;
-				elseif ($urlmonth == 2 && $urlyear % 4 == 0) 
-					$endday = 30;
-				elseif ($urlmonth == 2)
-					$endday = 29;
-				else 
-					$endday = 32;
-			// end day section
+			// Tentukan hari mulai
+			$startday = 1;
+			if ($nowyear == $urlyear && $nowmonth == $urlmonth) {
+				$startday = $nowday + 3;  // Mulai 3 hari setelah hari ini
+			}
 
-			if ($nowyear > $urlyear || (($nowmonth > $urlmonth) && ($nowyear == $urlyear)) || (($urlyear == $nowyear+1) && ($urlmonth > $nowmonth)) || $nowyear+1 < $urlyear) {
-
-				// condition for past date and one year for future
-
-				$datedata = "";
-
-			} elseif ($nowyear < $urlyear || (($nowmonth < $urlmonth) && ($nowyear == $urlyear))) {
+			// Generate tanggal yang tersedia
+			for ($i = $startday; $i <= $endday; $i++) {
+				$day = str_pad($i, 2, '0', STR_PAD_LEFT);
+				$date = "$urlyear-$urlmonth-$day";
 				
-				// for following date of same year
-				for ($i=1; $i < $endday; $i++) { 
-					if ($i>0 && $i<10) {
-						$editedday = '0'.$i;
-					} else {
-						$editedday = $i;
-					}
-					if (in_array($urlyear.'-'.$urlmonth.'-'.$editedday, $checkbookingdate)) {
-						continue;
-					} else {
-
-						switch ($i) {
-							case 1: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'01';
-								break;
-							case 2: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'02';
-								break;
-							case 3: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'03';
-								break;
-							case 4: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'04';
-								break;
-							case 5: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'05';
-								break;
-							case 6: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'06';
-								break;
-							case 7: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'07';
-								break;
-							case 8: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'08';
-								break;
-							case 9: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'09';
-								break;
-							default: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.$i;
-								break;
-						}
-					}
-					
-				}
-			} else {
-
-				// for date of same month and same year
-
-				for ($i=$nowday+3; $i < $endday; $i++) { 
-
-					if ($i>0 && $i<10) {
-						$editedday = '0'.$i;
-					} else {
-						$editedday = $i;
-					}
-
-					if (in_array($urlyear.'-'.$urlmonth.'-'.$editedday, $checkbookingdate)) {
-						continue;
-					} else {
-						switch ($i) {
-							case 1: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'01';
-								break;
-							case 2: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'02';
-								break;
-							case 3: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'03';
-								break;
-							case 4: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'04';
-								break;
-							case 5: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'05';
-								break;
-							case 6: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'06';
-								break;
-							case 7: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'07';
-								break;
-							case 8: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'08';
-								break;
-							case 9: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.'09';
-								break;
-							default: $datedata[$i] = base_url().'index.php/Request/add/'.$id.'/'.$urlyear.'/'.$urlmonth.'/'.$i;
-								break;
-						}
-					}
+				if (!in_array($date, $checkbookingdate)) {
+					$datedata[$i] = base_url("index.php/Request/add/$id/$urlyear/$urlmonth/$day");
 				}
 			}
 
+			// Load calendar
 			$this->load->library('calendar');
 			$this->calendar->show_next_prev = TRUE;
 			$this->calendar->next_prev_url = site_url('Tourguide/show/'.$id);
-
-			$data['calendar'] =  $this->calendar->generate($this->uri->segment(4), $this->uri->segment(5), $datedata);
+			$data['calendar'] = $this->calendar->generate($urlyear, $urlmonth, $datedata);
 
 			$this->load->view('template', $data);
 		}
